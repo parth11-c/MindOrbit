@@ -49,13 +49,8 @@ export default async function PsychiatristsPage() {
       `)
       .order('created_at', { ascending: false });
 
-    if (isSandbox) {
-      // Sandbox: show verified + pending (not rejected)
-      query = query.in('verification_status', ['verified', 'pending']) as any;
-    } else {
-      // Production: only show verified doctors
-      query = query.eq('verification_status', 'verified') as any;
-    }
+    // Only show verified (approved) doctors in the feed for booking
+    query = query.eq('verification_status', 'verified') as any;
 
     const { data: docsData, error: docsError } = await query;
 

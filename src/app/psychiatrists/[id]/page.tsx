@@ -47,6 +47,24 @@ export default async function PsychiatristProfilePage({ params }: { params: Prom
       .single();
 
     if (docData && !docError) {
+      // Check authorization: unverified profiles can only be viewed by the clinician themselves or an admin
+      let currentUserRole: string | null = null;
+      if (user?.id) {
+        const { data: dbUser } = await supabase
+          .from('users')
+          .select('role')
+          .eq('id', user.id)
+          .maybeSingle();
+        currentUserRole = dbUser?.role || null;
+      }
+
+      const isOwner = user?.id === docData.id;
+      const isAdmin = currentUserRole === 'admin';
+
+      if (docData.verification_status !== 'verified' && !isOwner && !isAdmin) {
+        notFound();
+      }
+
       const rawUser: any = Array.isArray(docData.users) ? docData.users[0] : docData.users;
       const rawSpec: any = Array.isArray(docData.specializations) ? docData.specializations[0] : docData.specializations;
       doctor = {
