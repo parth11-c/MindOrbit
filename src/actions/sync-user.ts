@@ -124,8 +124,15 @@ export async function syncCurrentUser() {
   }
 }
 
-export async function updateUserRole(userId: string, role: 'patient' | 'psychiatrist' | 'admin') {
+export async function updateUserRole(userId: string, role: 'patient' | 'psychiatrist' | 'admin', password?: string) {
   try {
+    if (role === 'admin') {
+      const securePassword = process.env.ADMIN_SWITCH_PASSWORD || 'Parth@1127';
+      if (password !== securePassword) {
+        return { success: false, error: 'Unauthorized: Incorrect Admin Authorization Password.' };
+      }
+    }
+
     const supabase = createAdminClient();
     const { error } = await supabase
       .from('users')

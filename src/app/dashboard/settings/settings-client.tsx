@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { User, Shield, RefreshCw, AlertCircle, Sparkles, LogOut } from 'lucide-react';
+import { User, Shield, RefreshCw, AlertCircle, Sparkles, LogOut, Lock } from 'lucide-react';
 import { updateUserRole } from '@/actions/sync-user';
 import { SignOutButton } from '@clerk/nextjs';
 
@@ -25,17 +25,25 @@ export default function SettingsClient({
 }: SettingsClientProps) {
   const router = useRouter();
   const [selectedRole, setSelectedRole] = useState<'patient' | 'psychiatrist' | 'admin'>(currentRole);
+  const [password, setPassword] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-  const handleRoleChange = async () => {
-    setIsUpdating(true);
+  const handleRoleSelection = (role: 'patient' | 'psychiatrist' | 'admin') => {
+    setSelectedRole(role);
+    setPassword('');
     setErrorMsg(null);
     setSuccessMsg(null);
+  };
+
+  const handleRoleChange = async () => {
+    setErrorMsg(null);
+    setSuccessMsg(null);
+    setIsUpdating(true);
 
     try {
-      const res = await updateUserRole(userId, selectedRole);
+      const res = await updateUserRole(userId, selectedRole, selectedRole === 'admin' ? password : undefined);
       if (res.success) {
         setSuccessMsg(`Account role updated to "${selectedRole}" successfully.`);
         
@@ -129,17 +137,34 @@ export default function SettingsClient({
           {(['patient', 'psychiatrist', 'admin'] as const).map((role) => (
             <button
               key={role}
-              onClick={() => setSelectedRole(role)}
+              onClick={() => handleRoleSelection(role)}
               className={`px-4 py-3 rounded-xl border text-xs font-bold capitalize transition-all cursor-pointer ${
                 selectedRole === role
                   ? 'border-red-600 bg-red-50/20 text-red-750 shadow-sm'
-                  : 'border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-500 hover:bg-neutral-50'
+                  : 'border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-505 hover:bg-neutral-50'
               }`}
             >
               {role === 'patient' ? 'Patient / User' : role === 'psychiatrist' ? 'Psychiatrist Doctor' : 'Admin Operations'}
             </button>
           ))}
         </div>
+
+        {selectedRole === 'admin' && (
+          <div className="space-y-2 pt-2 animate-fadeIn">
+            <label className="text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider flex items-center gap-1.5">
+              <Lock className="w-3.5 h-3.5 text-red-800" />
+              <span>Admin Authorization Password</span>
+            </label>
+            <input
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter admin password..."
+              className="w-full border border-neutral-205 dark:border-neutral-800 rounded-xl p-3 bg-white dark:bg-neutral-950 text-xs text-neutral-850 dark:text-neutral-200 focus:outline-none focus:ring-1 focus:ring-red-500"
+            />
+          </div>
+        )}
 
         <div className="border-t border-neutral-50 dark:border-neutral-850 pt-5 flex items-center justify-between gap-4">
           <p className="text-[10px] text-neutral-450 font-medium">

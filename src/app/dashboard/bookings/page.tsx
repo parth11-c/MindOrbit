@@ -67,55 +67,6 @@ export default async function PatientBookingsPage() {
         },
         hasReview: reviewBookingIds.has(b.id),
       }));
-    } else if (process.env.NEXT_PUBLIC_MOCK_PAYMENTS === 'true') {
-      // Seed sandbox mock bookings in local sandbox mode
-      bookings = [
-        {
-          id: 'mock-b1',
-          scheduled_time: new Date(Date.now() + 1000 * 60 * 60 * 48).toISOString(), // 2 days from now
-          amount: 1500,
-          status: 'booked',
-          payment_status: 'paid',
-          approval_status: 'approved',
-          doctor: {
-            id: 'doc1',
-            name: 'Dr. Sarah Jenkins',
-            specialization: 'Clinical Psychiatry',
-            avatar_url: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=250',
-          },
-          hasReview: false,
-        },
-        {
-          id: 'mock-b2',
-          scheduled_time: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // Yesterday
-          amount: 1800,
-          status: 'completed',
-          payment_status: 'paid',
-          approval_status: 'approved',
-          doctor: {
-            id: 'doc2',
-            name: 'Dr. Amit Patel',
-            specialization: 'Child & Adolescent Psychiatry',
-            avatar_url: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=250',
-          },
-          hasReview: false,
-        },
-        {
-          id: 'mock-b3',
-          scheduled_time: new Date(Date.now() - 1000 * 60 * 60 * 72).toISOString(), // 3 days ago
-          amount: 2200,
-          status: 'cancelled',
-          payment_status: 'refunded',
-          approval_status: 'rejected',
-          doctor: {
-            id: 'doc3',
-            name: 'Dr. Elena Rostova',
-            specialization: 'Addiction Psychiatry',
-            avatar_url: 'https://images.unsplash.com/photo-1594824813573-246434de83fb?auto=format&fit=crop&q=80&w=250',
-          },
-          hasReview: false,
-        },
-      ];
     }
   } catch (err) {
     console.error('Error fetching patient bookings history:', err);

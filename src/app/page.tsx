@@ -15,39 +15,6 @@ interface FeaturedDoctor {
   languages: string[];
 }
 
-const MOCK_DOCTORS: FeaturedDoctor[] = [
-  {
-    id: 'doc1',
-    name: 'Dr. Sarah Jenkins',
-    avatar_url: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=250',
-    specialization: 'Clinical Psychiatry',
-    experience: 12,
-    fee: 1500,
-    rating: 4.9,
-    languages: ['English', 'Spanish'],
-  },
-  {
-    id: 'doc2',
-    name: 'Dr. Amit Patel',
-    avatar_url: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=250',
-    specialization: 'Child & Adolescent Psychiatry',
-    experience: 9,
-    fee: 1800,
-    rating: 4.8,
-    languages: ['English', 'Hindi', 'Gujarati'],
-  },
-  {
-    id: 'doc3',
-    name: 'Dr. Elena Rostova',
-    avatar_url: 'https://images.unsplash.com/photo-1594824813573-246434de83fb?auto=format&fit=crop&q=80&w=250',
-    specialization: 'Addiction Psychiatry',
-    experience: 15,
-    fee: 2200,
-    rating: 4.95,
-    languages: ['English', 'Russian'],
-  },
-];
-
 export default async function LandingPage() {
   let featuredDocs: FeaturedDoctor[] = [];
 
@@ -73,23 +40,20 @@ export default async function LandingPage() {
       .eq('verification_status', 'verified')
       .limit(3);
 
-    if (error || !data || data.length === 0) {
-      featuredDocs = MOCK_DOCTORS;
-    } else {
+    if (!error && data && data.length > 0) {
       featuredDocs = data.map((doc: any) => ({
         id: doc.id,
-        name: `Dr. ${doc.users?.first_name} ${doc.users?.last_name}`,
+        name: `Dr. ${doc.users?.first_name || ''} ${doc.users?.last_name || ''}`,
         avatar_url: doc.users?.avatar_url || 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&q=80&w=250',
         specialization: doc.specializations?.name || 'Psychiatry',
         experience: doc.experience_years,
         fee: Number(doc.consultation_fee),
         rating: Number(doc.average_rating) || 5.0,
-        languages: doc.languages_spoken,
+        languages: doc.languages_spoken || ['English'],
       }));
     }
   } catch (err) {
     console.error('Error fetching landing page doctors:', err);
-    featuredDocs = MOCK_DOCTORS;
   }
 
   return (
@@ -188,70 +152,76 @@ export default async function LandingPage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredDocs.map((doc) => (
-              <div
-                key={doc.id}
-                className="flex flex-col bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800/80 rounded-2xl overflow-hidden shadow-sm hover-lift"
-              >
-                <div className="relative h-56 bg-neutral-100 dark:bg-neutral-850">
-                  <img
-                    src={doc.avatar_url}
-                    alt={doc.name}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-4 right-4 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-xs px-2 py-0.5 rounded-lg flex items-center space-x-0.5 text-[10px] font-extrabold text-neutral-800 dark:text-white border border-neutral-100/50 dark:border-neutral-800">
-                    <Star className="w-3 h-3 text-red-800 fill-red-800" />
-                    <span>{doc.rating.toFixed(1)}</span>
+          {featuredDocs.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {featuredDocs.map((doc) => (
+                <div
+                  key={doc.id}
+                  className="flex flex-col bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800/80 rounded-2xl overflow-hidden shadow-sm hover-lift"
+                >
+                  <div className="relative h-56 bg-neutral-100 dark:bg-neutral-850">
+                    <img
+                      src={doc.avatar_url}
+                      alt={doc.name}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute top-4 right-4 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-xs px-2 py-0.5 rounded-lg flex items-center space-x-0.5 text-[10px] font-extrabold text-neutral-800 dark:text-white border border-neutral-100/50 dark:border-neutral-800">
+                      <Star className="w-3 h-3 text-red-800 fill-red-800" />
+                      <span>{doc.rating.toFixed(1)}</span>
+                    </div>
                   </div>
-                </div>
 
-                <div className="p-6 flex-grow flex flex-col justify-between space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex items-center space-x-1.5">
-                      <h3 className="font-extrabold text-base text-neutral-900 dark:text-white leading-tight">
-                        {doc.name}
-                      </h3>
-                      <CheckCircle className="w-4 h-4 text-emerald-600 fill-emerald-100 flex-shrink-0" />
+                  <div className="p-6 flex-grow flex flex-col justify-between space-y-4">
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-1.5">
+                        <h3 className="font-extrabold text-base text-neutral-900 dark:text-white leading-tight">
+                          {doc.name}
+                        </h3>
+                        <CheckCircle className="w-4 h-4 text-emerald-600 fill-emerald-100 flex-shrink-0" />
+                      </div>
+
+                      <p className="text-[10px] text-red-800 font-bold uppercase tracking-wider">
+                        {doc.specialization}
+                      </p>
+
+                      <div className="grid grid-cols-2 gap-2 text-xs text-neutral-500 dark:text-neutral-400 pt-2 border-t border-neutral-50 dark:border-neutral-800">
+                        <div>
+                          <p className="text-[9px] text-neutral-500 dark:text-neutral-400 uppercase font-bold">Experience</p>
+                          <p className="font-semibold text-neutral-800 dark:text-neutral-200 mt-0.5">{doc.experience} Years</p>
+                        </div>
+                        <div>
+                          <p className="text-[9px] text-neutral-500 dark:text-neutral-400 uppercase font-bold">Languages</p>
+                          <p className="font-semibold text-neutral-800 dark:text-neutral-200 mt-0.5 truncate" title={doc.languages.join(', ')}>
+                            {doc.languages.slice(0, 2).join(', ')}
+                          </p>
+                        </div>
+                      </div>
                     </div>
 
-                    <p className="text-[10px] text-red-800 font-bold uppercase tracking-wider">
-                      {doc.specialization}
-                    </p>
-
-                    <div className="grid grid-cols-2 gap-2 text-xs text-neutral-500 dark:text-neutral-400 pt-2 border-t border-neutral-50 dark:border-neutral-800">
+                    <div className="pt-2 flex items-center justify-between">
                       <div>
-                        <p className="text-[9px] text-neutral-500 dark:text-neutral-400 uppercase font-bold">Experience</p>
-                        <p className="font-semibold text-neutral-800 dark:text-neutral-200 mt-0.5">{doc.experience} Years</p>
-                      </div>
-                      <div>
-                        <p className="text-[9px] text-neutral-500 dark:text-neutral-400 uppercase font-bold">Languages</p>
-                        <p className="font-semibold text-neutral-800 dark:text-neutral-200 mt-0.5 truncate" title={doc.languages.join(', ')}>
-                          {doc.languages.slice(0, 2).join(', ')}
+                        <p className="text-[9px] text-neutral-500 dark:text-neutral-400 uppercase font-bold">Consultation</p>
+                        <p className="text-base font-extrabold text-neutral-950 dark:text-white">
+                          {formatCurrency(doc.fee)}
                         </p>
                       </div>
-                    </div>
-                  </div>
 
-                  <div className="pt-2 flex items-center justify-between">
-                    <div>
-                      <p className="text-[9px] text-neutral-500 dark:text-neutral-400 uppercase font-bold">Consultation</p>
-                      <p className="text-base font-extrabold text-neutral-950 dark:text-white">
-                        {formatCurrency(doc.fee)}
-                      </p>
+                      <Link
+                        href={`/psychiatrists/${doc.id}`}
+                        className="bg-red-650 hover:bg-red-750 text-neutral-950 dark:text-neutral-950 text-xs font-semibold px-4.5 py-2 rounded-full transition-colors"
+                      >
+                        Book Session
+                      </Link>
                     </div>
-
-                    <Link
-                      href={`/psychiatrists/${doc.id}`}
-                      className="bg-red-600 hover:bg-red-750 text-neutral-900 dark:text-neutral-950 text-xs font-semibold px-4.5 py-2 rounded-full transition-colors"
-                    >
-                      Book Session
-                    </Link>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 border border-neutral-100 dark:border-neutral-800 rounded-2xl bg-white dark:bg-neutral-900">
+              <p className="text-xs text-neutral-500 font-medium">No verified psychiatric practitioners listed yet.</p>
+            </div>
+          )}
         </div>
       </section>
 

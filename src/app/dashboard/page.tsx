@@ -60,24 +60,6 @@ export default async function PatientDashboardPage() {
           avatar_url: b.psychiatrists?.users?.avatar_url,
         },
       }));
-    } else if (process.env.NEXT_PUBLIC_MOCK_PAYMENTS === 'true') {
-      // Provide a mock session in local sandbox mode if database has none
-      upcomingBookings = [
-        {
-          id: 'mock-booking-id-1',
-          scheduled_time: new Date(Date.now() + 1000 * 60 * 30).toISOString(), // 30 minutes from now
-          amount: 1500,
-          status: 'booked',
-          payment_status: 'paid',
-          approval_status: 'approved',
-          doctor: {
-            id: 'doc1',
-            name: 'Dr. Sarah Jenkins',
-            specialization: 'Clinical Psychiatry',
-            avatar_url: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=250',
-          },
-        },
-      ];
     }
   } catch (err) {
     console.error('Error querying patient bookings:', err);

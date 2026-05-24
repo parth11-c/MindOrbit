@@ -6,103 +6,7 @@ import { Star, GraduationCap, Award, Shield, ArrowLeft } from 'lucide-react';
 import BookingCalendar from './booking-calendar';
 import { formatCurrency, formatDate } from '@/lib/utils';
 
-const MOCK_DOCTORS: { [key: string]: any } = {
-  doc1: {
-    id: 'doc1',
-    first_name: 'Sarah',
-    last_name: 'Jenkins',
-    avatar_url: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=250',
-    specialization_name: 'Clinical Psychiatry',
-    experience_years: 12,
-    consultation_fee: 1500,
-    average_rating: 4.90,
-    languages: ['English', 'Spanish'],
-    bio: 'Dedicated clinical psychiatrist specialized in CBT therapies, major depressive disorders, and cognitive counseling with 12 years of hands-on experience. She utilizes evidence-based approaches to design customized care programs.',
-    education: 'MD in Psychiatry - Harvard Medical School, Residency in Clinical Psychiatry - Massachusetts General Hospital.',
-    verification_status: 'verified',
-  },
-  doc2: {
-    id: 'doc2',
-    first_name: 'Amit',
-    last_name: 'Patel',
-    avatar_url: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=250',
-    specialization_name: 'Child & Adolescent Psychiatry',
-    experience_years: 9,
-    consultation_fee: 1800,
-    average_rating: 4.80,
-    gender: 'male',
-    languages: ['English', 'Hindi', 'Gujarati'],
-    bio: 'Specialist child therapist focused on learning difficulties, adolescent adjustment, and developmental counseling in secure online sessions. He works actively with schools and parents to provide structural emotional support.',
-    education: 'MD in Child Psychiatry - AIIMS New Delhi, Fellowship in Adolescent Therapy - Boston Children’s Hospital.',
-    verification_status: 'verified',
-  },
-  doc3: {
-    id: 'doc3',
-    first_name: 'Elena',
-    last_name: 'Rostova',
-    avatar_url: 'https://images.unsplash.com/photo-1594824813573-246434de83fb?auto=format&fit=crop&q=80&w=250',
-    specialization_name: 'Addiction Psychiatry',
-    experience_years: 15,
-    consultation_fee: 2200,
-    average_rating: 4.95,
-    languages: ['English', 'Russian'],
-    bio: 'Providing comprehensive addiction consultation and medical support for cognitive recovery, dependency relief, and behavioral rehab. Her empathetic therapy helps families and patients navigate the road to healing.',
-    education: 'MD in Psychiatry - Saint Petersburg State University, specialization in Substance Abuse Treatment - Johns Hopkins University.',
-    verification_status: 'verified',
-  },
-};
 
-const MOCK_SLOTS = (docId: string) => {
-  const slots: any[] = [];
-  const today = new Date();
-  for (let i = 0; i < 2; i++) {
-    const day = new Date();
-    day.setDate(today.getDate() + i);
-    const times = [
-      { start: 10, end: 11 },
-      { start: 14, end: 15 },
-      { start: 16, end: 17 },
-    ];
-    times.forEach((t, idx) => {
-      const start = new Date(day);
-      start.setHours(t.start, 0, 0, 0);
-      const end = new Date(day);
-      end.setHours(t.end, 0, 0, 0);
-      slots.push({
-        id: `${docId}-slot-${i}-${idx}`,
-        start_time: start.toISOString(),
-        end_time: end.toISOString(),
-        is_booked: false,
-      });
-    });
-  }
-  return slots;
-};
-
-const MOCK_REVIEWS = [
-  {
-    id: 'r1',
-    rating: 5,
-    comment: 'Exceptional session. Dr. Jenkins is extremely compassionate and structured in her counseling approach. I gained significant clarity about managing my burnout.',
-    created_at: new Date(Date.now() - 3 * 24 * 60 * 650 * 1000).toISOString(),
-    users: {
-      first_name: 'David',
-      last_name: 'Cooper',
-      avatar_url: '',
-    },
-  },
-  {
-    id: 'r2',
-    rating: 4,
-    comment: 'Very professional psychiatrist. She listens attentively and makes you feel heard without judgment. I will definitely be booking follow-up sessions.',
-    created_at: new Date(Date.now() - 10 * 24 * 60 * 650 * 1000).toISOString(),
-    users: {
-      first_name: 'Sarah',
-      last_name: 'Connor',
-      avatar_url: '',
-    },
-  },
-];
 
 export default async function PsychiatristProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -190,22 +94,12 @@ export default async function PsychiatristProfilePage({ params }: { params: Prom
         .order('created_at', { ascending: false });
 
       reviews = reviewsData || [];
-    } else if (MOCK_DOCTORS[id]) {
-      doctor = MOCK_DOCTORS[id];
-      slots = MOCK_SLOTS(id);
-      reviews = MOCK_REVIEWS;
     } else {
       notFound();
     }
   } catch (err) {
     console.error('Error fetching doctor details:', err);
-    if (MOCK_DOCTORS[id]) {
-      doctor = MOCK_DOCTORS[id];
-      slots = MOCK_SLOTS(id);
-      reviews = MOCK_REVIEWS;
-    } else {
-      notFound();
-    }
+    notFound();
   }
 
   return (
